@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -59,6 +60,7 @@ class HomeController extends AbstractController
                     'properties' => [
                         'subject' => 'Hello Xehapa',
                         'email' => 'hendra@xehapa.com',
+                        'ref' => Request::createFromGlobals()->getBaseUrl(),
                     ],
                 ],
             ]);
