@@ -29,7 +29,7 @@ class HomeController extends AbstractController
         $imgSrc = $this->generateUrl(
             'app_logo_img',
             ['name' => 'Joko'],
-            UrlGeneratorInterface::NETWORK_PATH
+            UrlGeneratorInterface::ABSOLUTE_URL
         );
 
         try {
