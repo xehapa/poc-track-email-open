@@ -6,7 +6,9 @@
 parameters:
     APP_ENV: '%env(APP_ENV)%'
     MAILER_DSN: '%env(MAILER_DSN)%'
-    SEGMENT_WRITE_KEY: '%env(SEGMENT_WRITE_KEY)%'
+    SEGMENT_HTTP_API_WRITE_KEY: '%env(SEGMENT_HTTP_API_WRITE_KEY)%'
+    SEGMENT_PIXEL_API_WRITE_KEY: '%env(SEGMENT_PIXEL_API_WRITE_KEY)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
