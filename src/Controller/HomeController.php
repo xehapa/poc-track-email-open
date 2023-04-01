@@ -103,9 +103,10 @@ class HomeController extends AbstractController
     {
         try {
             $email = (new Email())
-                ->from(new Address(address: 'test@local.test', name: 'Joko Bodo'))
+                ->from(new Address(address: 'suppor@alex-poc-track-email-is-opened.herokuapp.com', name: 'Joko Bodo'))
                 ->to($recipient ?? 'aintdra@gmail.com')
-                ->html('<img src="' . $imgSrc . '" alt="testing image"/>');
+                ->subject('Google Celebrate Your Birthday')
+                ->html('<img src="' . $imgSrc . '" alt="logo" />');
 
             $this->mailer->send($email);
         } catch (TransportExceptionInterface $e) {
