@@ -84,7 +84,7 @@ class HomeController extends AbstractController
             'data' => base64_encode(json_encode($payload)),
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $this->sendMail(imgSrc: $imgSrc);
+        $this->sendMail(imgSrc: $imgSrc, recipient: $request->query->get('r'));
 
         return new Response('Tracking email open using Segment Pixel API');
     }
@@ -126,12 +126,12 @@ class HomeController extends AbstractController
         return $this->file('stockclubs.webp', 'stockclubs-logo.webp', ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
-    private function sendMail(string $imgSrc): void
+    private function sendMail(string $imgSrc, ?string $recipient = null): void
     {
         try {
             $email = (new Email())
                 ->from('test@local.test')
-                ->to('aintdra@gmail.com')
+                ->to($recipient ?? 'aintdra@gmail.com')
                 ->html('<img src="' . $imgSrc . '" alt="testing image"/>');
 
             $this->mailer->send($email);
