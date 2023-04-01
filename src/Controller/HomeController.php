@@ -12,8 +12,10 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HomeController extends AbstractController
@@ -27,7 +29,9 @@ class HomeController extends AbstractController
     public function __invoke(Request $request, string | null $edp = null): Response
     {
         if ($edp === 'http-api') {
-            return $this->forward(__CLASS__ . '::httpApi');
+            return $this->forward(__CLASS__ . '::httpApi', [
+                'request' => $request
+            ]);
         }
 
         if ($edp === 'pixel-api') {
@@ -60,13 +64,13 @@ class HomeController extends AbstractController
     }
 
     #[Route('/http-api')]
-    public function httpApi(): Response
+    public function httpApi(Request $request): Response
     {
-//        $imgSrc = $this->generateUrl('app_logo_img', [
-//            'customQueryParam' => uniqid(prefix: 'custom_param_value'),
-//        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        $imgSrc = $this->generateUrl('app_logo_img', [
+            'customQueryParam' => uniqid(prefix: 'custom_param_value'),
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $this->sendMail(imgSrc: 'https://alex-poc-track-email-is-opened.herokuapp.com/image/logo.png');
+        $this->sendMail(imgSrc: $imgSrc, recipient: $request->query->get('r'));
 
         return new Response('Tracking email open using Segment Pixel API');
     }
@@ -95,12 +99,12 @@ class HomeController extends AbstractController
         return $this->file('stockclubs.webp', 'stockclubs-logo.webp', ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
-    private function sendMail(string $imgSrc): void
+    private function sendMail(string $imgSrc, ?string $recipient = null): void
     {
         try {
             $email = (new Email())
-                ->from('test@local.test')
-                ->to('aintdra@gmail.com')
+                ->from(new Address(address: 'test@local.test', name: 'Joko Bodo'))
+                ->to($recipient ?? 'aintdra@gmail.com')
                 ->html('<img src="' . $imgSrc . '" alt="testing image"/>');
 
             $this->mailer->send($email);
