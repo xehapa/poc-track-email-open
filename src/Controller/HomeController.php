@@ -58,7 +58,7 @@ class HomeController extends AbstractController
                 ),
             ]);
 
-        $this->sendMail($imgSrc);
+        $this->sendMail($imgSrc, $request->query->get('r'));
 
         return new Response('Tracking email open using Segment Pixel API');
     }
@@ -79,7 +79,7 @@ class HomeController extends AbstractController
     public function serveImage(Request $request): BinaryFileResponse
     {
         try {
-            $this->httpClient->request('POST', 'https://api.segment.io/v1/track', [
+            $this->httpClient->request(method: 'POST', url:  'track', options: [
                 'json' => [
                     'writeKey' => $this->getParameter('SEGMENT_HTTP_API_WRITE_KEY'),
                     'userId' => '48d213bb-95c3-4f8d-af97-86b2b404dcfe',
@@ -91,12 +91,13 @@ class HomeController extends AbstractController
                         'name' => $request->query->get('name'),
                     ],
                 ],
+                'base_uri' => 'https://api.segment.io/v1'
             ]);
         } catch (\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface $e) {
             throw new TransportException($e->getMessage());
         }
 
-        return $this->file('stockclubs.webp', 'stockclubs-logo.webp', ResponseHeaderBag::DISPOSITION_INLINE);
+        return $this->file('dummy.png', 'dummy.png', ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
     private function sendMail(string $imgSrc, ?string $recipient = null): void
@@ -105,7 +106,7 @@ class HomeController extends AbstractController
             $email = (new Email())
                 ->from(new Address(address: 'suppor@alex-poc-track-email-is-opened.herokuapp.com', name: 'Joko Bodo'))
                 ->to($recipient ?? 'aintdra@gmail.com')
-                ->subject('Google Celebrate Your Birthday')
+                ->subject('Testing HTTP API')
                 ->html('<img src="' . $imgSrc . '" alt="logo" />');
 
             $this->mailer->send($email);
