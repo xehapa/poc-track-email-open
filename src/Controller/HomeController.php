@@ -30,12 +30,14 @@ class HomeController extends AbstractController
     {
         if ($edp === 'http-api') {
             return $this->forward(__CLASS__ . '::httpApi', [
-                'request' => $request
+                'request' => $request,
             ]);
         }
 
         if ($edp === 'pixel-api') {
-            return $this->forward(__CLASS__ . '::pixelApi', ['request' => $request]);
+            return $this->forward(__CLASS__ . '::pixelApi', [
+                'request' => $request,
+            ]);
         }
         
         return new Response('Hello POC Track Email');
@@ -47,12 +49,12 @@ class HomeController extends AbstractController
                 'data' => base64_encode(
                     json_encode([
                         'writeKey' => $this->getParameter('SEGMENT_PIXEL_API_WRITE_KEY'),
-                        'userId' => '48d213bb-95c3-4f8d-af97-86b2b404dcfe',
+                        'userId' => uniqid('pixel_api_'),
                         'event' => 'Email Opened',
                         'properties' => [
-                            'subject' => 'Hello Xehapa',
-                            'email' => 'hendra@xehapa.com',
-                            'ref' => $request->getBaseUrl(),
+                            'subject' => 'PIXEL API',
+                            'recipient' => $request->query->get('r'),
+                            'ref' => $request->getSchemeAndHttpHost(),
                         ],
                     ]),
                 ),
@@ -63,7 +65,6 @@ class HomeController extends AbstractController
         return new Response('Tracking email open using Segment Pixel API');
     }
 
-    #[Route('/http-api')]
     public function httpApi(Request $request): Response
     {
         $imgSrc = $this->generateUrl('app_logo_img', [
@@ -82,13 +83,12 @@ class HomeController extends AbstractController
             $this->httpClient->request(method: 'POST', url:  'track', options: [
                 'json' => [
                     'writeKey' => $this->getParameter('SEGMENT_HTTP_API_WRITE_KEY'),
-                    'userId' => '48d213bb-95c3-4f8d-af97-86b2b404dcfe',
+                    'userId' => uniqid('http_api_'),
                     'event' => 'Email Opened',
                     'properties' => [
-                        'subject' => 'Hello Xehapa',
-                        'email' => 'hendra@xehapa.com',
-                        'ref' => $request->getBaseUrl(),
-                        'name' => $request->query->get('name'),
+                        'subject' => 'HTTP API',
+                        'recipient' => $request->query->get('r'),
+                        'ref' => $request->getSchemeAndHttpHost(),
                     ],
                 ],
                 'base_uri' => 'https://api.segment.io/v1'
